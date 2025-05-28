@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriCalc - Calculatrice de Calories Avancée</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-heartbeat pulse"></i>
+                <h1>NutriCalc</h1>
+            </div>
+            <p class="tagline">Votre partenaire nutrition intelligent</p>
+        </header>
+
+        <main>
+            <section class="calculator-section">
+                <h2>Calculatrice de Calories <span class="highlight">Avancée</span></h2>
+                
+                <div class="calculator-container">
+                    <div class="profile-inputs">
+                        <h3>Votre Profil</h3>
+                        <div class="input-group">
+                            <label for="gender">Genre</label>
+                            <div class="custom-select">
+                                <select id="gender">
+                                    <option value="homme">Homme</option>
+                                    <option value="femme">Femme</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="age">Âge</label>
+                            <input type="number" id="age" min="15" max="100" value="30">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="height">Taille (cm)</label>
+                            <input type="number" id="height" min="100" max="250" value="170">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="weight">Poids (kg)</label>
+                            <input type="number" id="weight" min="30" max="300" value="70">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="activity">Niveau d'activité</label>
+                            <div class="custom-select">
+                                <select id="activity">
+                                    <option value="1.2">Sédentaire (peu ou pas d'exercice)</option>
+                                    <option value="1.375">Légèrement actif (exercice léger 1-3 jours/semaine)</option>
+                                    <option value="1.55" selected>Modérément actif (exercice modéré 3-5 jours/semaine)</option>
+                                    <option value="1.725">Très actif (exercice intense 6-7 jours/semaine)</option>
+                                    <option value="1.9">Extrêmement actif (exercice très intense, travail physique)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="goal">Objectif</label>
+                            <div class="custom-select">
+                                <select id="goal">
+                                    <option value="deficit">Perte de poids</option>
+                                    <option value="maintain" selected>Maintien du poids</option>
+                                    <option value="surplus">Prise de masse</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="body-visualization">
+                        <h3>Représentation Corporelle</h3>
+                        <div class="human-body-container">
+                            <div class="human-body">
+                                <div class="head"></div>
+                                <div class="torso"></div>
+                                <div class="arm left-arm"></div>
+                                <div class="arm right-arm"></div>
+                                <div class="leg left-leg"></div>
+                                <div class="leg right-leg"></div>
+                            </div>
+                            <div id="bmi-indicator" class="bmi-indicator">IMC: <span id="bmi-value">22.5</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="calculate-btn" class="calculate-btn">Calculer mes besoins</button>
+            </section>
+            
+            <section class="results-section hidden" id="results-section">
+                <h2>Vos Résultats <span class="highlight">Personnalisés</span></h2>
+                
+                <div class="results-container">
+                    <div class="calorie-results">
+                        <div class="result-card">
+                            <h3>Métabolisme de Base</h3>
+                            <div class="result-value" id="bmr-value">1600</div>
+                            <p>calories/jour</p>
+                            <div class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">Calories brûlées au repos pour maintenir les fonctions vitales</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-card highlight-card">
+                            <h3>Besoins Caloriques Totaux</h3>
+                            <div class="result-value" id="tdee-value">2200</div>
+                            <p>calories/jour</p>
+                            <div class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">Calories totales nécessaires selon votre niveau d'activité</span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-card">
+                            <h3>Objectif Calorique</h3>
+                            <div class="result-value" id="goal-value">2200</div>
+                            <p>calories/jour</p>
+                            <div class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">Calories ajustées selon votre objectif personnel</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="macros-section">
+                        <h3>Répartition des Macronutriments</h3>
+                        <div class="chart-container">
+                            <canvas id="macros-chart"></canvas>
+                        </div>
+                        <div class="macros-details">
+                            <div class="macro-item">
+                                <div class="color-indicator protein-color"></div>
+                                <div class="macro-name">Protéines</div>
+                                <div class="macro-value" id="protein-value">120g</div>
+                                <div class="macro-percent" id="protein-percent">25%</div>
+                            </div>
+                            <div class="macro-item">
+                                <div class="color-indicator carbs-color"></div>
+                                <div class="macro-name">Glucides</div>
+                                <div class="macro-value" id="carbs-value">220g</div>
+                                <div class="macro-percent" id="carbs-percent">50%</div>
+                            </div>
+                            <div class="macro-item">
+                                <div class="color-indicator fat-color"></div>
+                                <div class="macro-name">Lipides</div>
+                                <div class="macro-value" id="fat-value">60g</div>
+                                <div class="macro-percent" id="fat-percent">25%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="nutrition-section hidden" id="nutrition-section">
+                <h2>Analyse <span class="highlight">Nutritionnelle</span></h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="vitamins">Vitamines</button>
+                    <button class="tab-btn" data-tab="minerals">Minéraux</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="vitamins-tab">
+                        <div class="chart-container">
+                            <canvas id="vitamins-chart"></canvas>
+                        </div>
+                        <div class="nutrition-info">
+                            <h3>Recommandations Vitamines</h3>
+                            <p>Les vitamines sont essentielles pour de nombreuses fonctions corporelles. Voici les apports recommandés basés sur votre profil :</p>
+                            <div class="nutrition-grid">
+                                <div class="nutrition-item">
+                                    <h4>Vitamine A</h4>
+                                    <p>Importante pour la vision et le système immunitaire</p>
+                                    <div class="nutrition-value" id="vitamin-a-value">900 μg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Vitamine C</h4>
+                                    <p>Antioxydant puissant et soutien immunitaire</p>
+                                    <div class="nutrition-value" id="vitamin-c-value">90 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Vitamine D</h4>
+                                    <p>Essentielle pour la santé des os</p>
+                                    <div class="nutrition-value" id="vitamin-d-value">15 μg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Vitamine E</h4>
+                                    <p>Protège les cellules contre les dommages</p>
+                                    <div class="nutrition-value" id="vitamin-e-value">15 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Vitamine K</h4>
+                                    <p>Importante pour la coagulation sanguine</p>
+                                    <div class="nutrition-value" id="vitamin-k-value">120 μg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Vitamines B</h4>
+                                    <p>Essentielles pour le métabolisme énergétique</p>
+                                    <div class="nutrition-value" id="vitamin-b-value">Diverses</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="minerals-tab">
+                        <div class="chart-container">
+                            <canvas id="minerals-chart"></canvas>
+                        </div>
+                        <div class="nutrition-info">
+                            <h3>Recommandations Minéraux</h3>
+                            <p>Les minéraux sont cruciaux pour diverses fonctions corporelles. Voici les apports recommandés basés sur votre profil :</p>
+                            <div class="nutrition-grid">
+                                <div class="nutrition-item">
+                                    <h4>Calcium</h4>
+                                    <p>Essentiel pour la santé des os et des dents</p>
+                                    <div class="nutrition-value" id="calcium-value">1000 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Fer</h4>
+                                    <p>Crucial pour le transport de l'oxygène</p>
+                                    <div class="nutrition-value" id="iron-value">8 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Magnésium</h4>
+                                    <p>Important pour la fonction musculaire</p>
+                                    <div class="nutrition-value" id="magnesium-value">400 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Zinc</h4>
+                                    <p>Soutient le système immunitaire</p>
+                                    <div class="nutrition-value" id="zinc-value">11 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Potassium</h4>
+                                    <p>Régule l'équilibre hydrique et la pression artérielle</p>
+                                    <div class="nutrition-value" id="potassium-value">3500 mg</div>
+                                </div>
+                                <div class="nutrition-item">
+                                    <h4>Sodium</h4>
+                                    <p>Nécessaire pour la fonction nerveuse</p>
+                                    <div class="nutrition-value" id="sodium-value">2300 mg</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 NutriCalc - Calculatrice de Calories Avancée</p>
+            <p class="disclaimer">Cette calculatrice fournit des estimations basées sur des formules scientifiques. Consultez un professionnel de santé pour des conseils personnalisés.</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
